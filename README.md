@@ -1,1 +1,1 @@
-# Nezo-Ai
+# Nez-Ai
