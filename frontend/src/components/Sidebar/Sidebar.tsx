@@ -1,4 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
+import {
+  MessageSquare,
+  Folder,
+  BrainCircuit,
+  Cpu,
+  Settings,
+  Circle,
+} from 'lucide-react';
 import './Sidebar.css';
 import { checkBackendHealth } from '../../services/api';
 
@@ -6,80 +16,16 @@ interface NavItem {
   key: string;
   label: string;
   disabled: boolean;
+  icon: React.ReactNode;
 }
 
 const navItems: NavItem[] = [
-  { key: 'chat', label: 'Chat', disabled: false },
-  { key: 'files', label: 'Files', disabled: true },
-  { key: 'memory', label: 'Memory', disabled: true },
-  { key: 'models', label: 'Models', disabled: true },
-  { key: 'settings', label: 'Settings', disabled: true },
+  { key: 'chat', label: 'Chat', disabled: false, icon: <MessageSquare size={18} /> },
+  { key: 'files', label: 'Files', disabled: true, icon: <Folder size={18} /> },
+  { key: 'memory', label: 'Memory', disabled: true, icon: <BrainCircuit size={18} /> },
+  { key: 'models', label: 'Models', disabled: true, icon: <Cpu size={18} /> },
+  { key: 'settings', label: 'Settings', disabled: true, icon: <Settings size={18} /> },
 ];
-
-const ChatIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v10c0 .83-.67 1.5-1.5 1.5H9l-4 3.5v-3.5H5.5C4.67 17 4 16.33 4 15.5v-10z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const FilesIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M4 6.5C4 5.67 4.67 5 5.5 5H10l2 2h6.5c.83 0 1.5.67 1.5 1.5v9c0 .83-.67 1.5-1.5 1.5h-13C4.67 19 4 18.33 4 17.5v-11z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const MemoryIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <rect x="5" y="5" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
-    <path
-      d="M9 9h6v6H9z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    />
-  </svg>
-);
-
-const ModelsIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
-    <path
-      d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const SettingsIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.5" />
-    <path
-      d="M19.4 13a7.9 7.9 0 000-2l1.8-1.4-2-3.4-2.1.7a7.9 7.9 0 00-1.7-1l-.3-2.2h-4l-.3 2.2a7.9 7.9 0 00-1.7 1l-2.1-.7-2 3.4L4.6 11a7.9 7.9 0 000 2l-1.8 1.4 2 3.4 2.1-.7a7.9 7.9 0 001.7 1l.3 2.2h4l.3-2.2a7.9 7.9 0 001.7-1l2.1.7 2-3.4L19.4 13z"
-      stroke="currentColor"
-      strokeWidth="1.3"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const icons: Record<string, JSX.Element> = {
-  chat: <ChatIcon />,
-  files: <FilesIcon />,
-  memory: <MemoryIcon />,
-  models: <ModelsIcon />,
-  settings: <SettingsIcon />,
-};
 
 const Sidebar: React.FC = () => {
   const [connected, setConnected] = useState<boolean>(true);
@@ -99,9 +45,20 @@ const Sidebar: React.FC = () => {
   }, []);
 
   return (
-    <aside className="sidebar">
+    <motion.aside
+      className="sidebar"
+      initial={{ x: -24, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+    >
       <div className="sidebar-brand">
-        <div className="sidebar-logo">N</div>
+        <motion.div
+          className="sidebar-logo"
+          whileHover={{ scale: 1.05, rotate: 3 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        >
+          N
+        </motion.div>
         <div className="sidebar-brand-text">
           <span className="sidebar-title">Nez AI</span>
           <span className="sidebar-subtitle">Local AI Assistant</span>
@@ -109,30 +66,50 @@ const Sidebar: React.FC = () => {
       </div>
 
       <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <button
+        {navItems.map((item, index) => (
+          <motion.button
             key={item.key}
-            className={`sidebar-nav-item ${!item.disabled ? 'sidebar-nav-item--active' : ''} ${
-              item.disabled ? 'sidebar-nav-item--disabled' : ''
-            }`}
+            className={clsx(
+              'sidebar-nav-item',
+              !item.disabled && 'sidebar-nav-item--active',
+              item.disabled && 'sidebar-nav-item--disabled'
+            )}
             disabled={item.disabled}
             type="button"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.35, delay: 0.08 + index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={item.disabled ? undefined : { x: 2 }}
           >
-            <span className="sidebar-nav-icon">{icons[item.key]}</span>
+            {!item.disabled && (
+              <motion.span
+                layoutId="sidebar-active-pill"
+                className="sidebar-nav-indicator"
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              />
+            )}
+            <span className="sidebar-nav-icon">{item.icon}</span>
             <span>{item.label}</span>
-          </button>
+          </motion.button>
         ))}
       </nav>
 
       <div className="sidebar-footer">
         <div className="sidebar-status">
-          <span className={`status-dot ${connected ? 'status-dot--online' : 'status-dot--offline'}`} />
+          <span className="status-dot-wrapper">
+            <Circle
+              size={8}
+              fill={connected ? '#4ADE80' : '#E5484D'}
+              color={connected ? '#4ADE80' : '#E5484D'}
+              className={connected ? 'status-dot-glow' : ''}
+            />
+          </span>
           <span className="status-label">
             {connected ? 'Connected' : 'Disconnected'}
           </span>
         </div>
       </div>
-    </aside>
+    </motion.aside>
   );
 };
 

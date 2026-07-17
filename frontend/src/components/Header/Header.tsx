@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Settings, Circle, Cpu } from 'lucide-react';
 import './Header.css';
-import Button from '../Common/Button';
-
-const SettingsIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.5" />
-    <path
-      d="M19.4 13a7.9 7.9 0 000-2l1.8-1.4-2-3.4-2.1.7a7.9 7.9 0 00-1.7-1l-.3-2.2h-4l-.3 2.2a7.9 7.9 0 00-1.7 1l-2.1-.7-2 3.4L4.6 11a7.9 7.9 0 000 2l-1.8 1.4 2 3.4 2.1-.7a7.9 7.9 0 001.7 1l.3 2.2h4l.3-2.2a7.9 7.9 0 001.7-1l2.1.7 2-3.4L19.4 13z"
-      stroke="currentColor"
-      strokeWidth="1.3"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 const Header: React.FC = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formattedTime = time.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
   return (
     <header className="app-header">
       <div className="app-header-titles">
@@ -23,10 +24,30 @@ const Header: React.FC = () => {
       </div>
 
       <div className="app-header-actions">
-        <Button variant="ghost" title="Settings">
-          <SettingsIcon />
-          <span>Settings</span>
-        </Button>
+        <div className="header-pill">
+          <Cpu size={14} />
+          <span>Qwen 3.5</span>
+        </div>
+
+        <div className="header-pill">
+          <Circle size={7} fill="#4ADE80" color="#4ADE80" className="header-pill-dot" />
+          <span>Connected</span>
+        </div>
+
+        <div className="header-pill header-pill--clock">
+          <span>{formattedTime}</span>
+        </div>
+
+        <motion.button
+          className="header-settings-btn"
+          whileHover={{ rotate: 60, scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          title="Settings"
+          type="button"
+        >
+          <Settings size={17} />
+        </motion.button>
       </div>
     </header>
   );

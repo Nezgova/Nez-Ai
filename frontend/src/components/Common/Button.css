@@ -5,14 +5,14 @@
   gap: 8px;
   border-radius: var(--radius-md);
   padding: 10px 16px;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
-  transition: background-color var(--transition-fast), color var(--transition-fast),
-    border-color var(--transition-fast), transform var(--transition-fast);
+  transition: background-color 0.18s var(--ease-premium), color 0.18s var(--ease-premium),
+    border-color 0.18s var(--ease-premium), box-shadow 0.18s var(--ease-premium);
 }
 
 .nez-button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
@@ -23,10 +23,11 @@
 
 .nez-button--primary:hover:not(:disabled) {
   background-color: var(--color-gold-hover);
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.25);
 }
 
 .nez-button--ghost {
-  background-color: transparent;
+  background-color: var(--color-card);
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -47,10 +48,10 @@
 .nez-button--icon:hover:not(:disabled) {
   border-color: var(--color-gold);
   color: var(--color-gold);
-  transform: translateY(-1px);
 }
 
 .nez-button--active {
   color: var(--color-gold);
   border-color: var(--color-gold);
+  box-shadow: var(--shadow-gold);
 }

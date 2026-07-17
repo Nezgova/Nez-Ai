@@ -1,68 +1,91 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Paperclip, Mic, Image as ImageIcon, Send } from 'lucide-react';
 import './ChatInput.css';
 
-const AttachmentIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M8 12.5l6.5-6.5a3 3 0 114.24 4.24l-8.5 8.5a5 5 0 11-7.07-7.07L11 3.83"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+interface ChatInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  onSend: () => void;
+}
 
-const MicIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.5" />
-    <path
-      d="M5 11a7 7 0 0014 0M12 18v3"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  </svg>
-);
+const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend }) => {
+  const [focused, setFocused] = useState(false);
 
-const SendIcon = () => (
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M4 12l16-8-6 8 6 8-16-8z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-      fill="currentColor"
-    />
-  </svg>
-);
+  const handleSend = () => {
+    if (value.trim().length === 0) return;
+    onSend();
+  };
 
-const ChatInput: React.FC = () => {
-  const [value, setValue] = useState('');
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
+  };
 
   return (
     <div className="chat-input-wrapper">
-      <div className="chat-input-bar">
-        <button className="chat-input-icon-btn" type="button" title="Attach file">
-          <AttachmentIcon />
-        </button>
+      <motion.div
+        className={`chat-input-bar ${focused ? 'chat-input-bar--focused' : ''}`}
+        animate={{
+          boxShadow: focused
+            ? '0 0 0 1px rgba(212,175,55,0.5), 0 8px 30px rgba(212,175,55,0.12)'
+            : '0 2px 10px rgba(0,0,0,0.3)',
+        }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <motion.button
+          className="chat-input-icon-btn"
+          type="button"
+          title="Attach file"
+          whileHover={{ scale: 1.08, rotate: -4 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          <Paperclip size={17} />
+        </motion.button>
+
+        <motion.button
+          className="chat-input-icon-btn"
+          type="button"
+          title="Attach image"
+          whileHover={{ scale: 1.08, rotate: 4 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          <ImageIcon size={17} />
+        </motion.button>
 
         <input
           className="chat-input-field"
           type="text"
           placeholder="Message Nez AI..."
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          onKeyDown={handleKeyDown}
         />
 
-        <button className="chat-input-icon-btn" type="button" title="Voice input">
-          <MicIcon />
-        </button>
+        <motion.button
+          className="chat-input-icon-btn"
+          type="button"
+          title="Voice input"
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          <Mic size={17} />
+        </motion.button>
 
-        <button className="chat-input-send-btn" type="button" title="Send message">
-          <SendIcon />
-        </button>
-      </div>
+        <motion.button
+          className="chat-input-send-btn"
+          type="button"
+          title="Send message"
+          onClick={handleSend}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.92 }}
+        >
+          <Send size={16} />
+        </motion.button>
+      </motion.div>
       <p className="chat-input-hint">Nez AI runs fully local. Nothing leaves your device.</p>
     </div>
   );

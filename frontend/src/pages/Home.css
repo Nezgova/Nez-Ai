@@ -1,11 +1,15 @@
 .home-layout {
+  position: relative;
   display: flex;
   width: 100%;
   height: 100vh;
   background-color: var(--color-bg);
+  overflow: hidden;
 }
 
 .home-main {
+  position: relative;
+  z-index: 1;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -14,19 +18,24 @@
 }
 
 @media (max-width: 1024px) {
-  .home-layout {
-    flex-direction: row;
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
   }
 }
 
 @media (max-width: 768px) {
-  .home-layout .sidebar {
-    width: 220px;
-    min-width: 220px;
+  .sidebar {
+    width: 200px;
+    min-width: 200px;
   }
 
   .app-header {
     padding: 16px 20px;
+  }
+
+  .app-header-actions .header-pill span {
+    display: none;
   }
 
   .chat-window {
@@ -35,5 +44,9 @@
 
   .chat-input-wrapper {
     padding: 14px 20px 18px 20px;
+  }
+
+  .empty-state-grid {
+    grid-template-columns: 1fr;
   }
 }
