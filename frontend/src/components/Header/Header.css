@@ -1,0 +1,32 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+}
+
+.app-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-header-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--color-text);
+}
+
+.app-header-subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

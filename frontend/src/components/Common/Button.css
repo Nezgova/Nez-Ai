@@ -1,0 +1,56 @@
+.nez-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.nez-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nez-button--primary {
+  background-color: var(--color-gold);
+  color: #14161B;
+}
+
+.nez-button--primary:hover:not(:disabled) {
+  background-color: var(--color-gold-hover);
+}
+
+.nez-button--ghost {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.nez-button--ghost:hover:not(:disabled) {
+  border-color: var(--color-gold);
+  color: var(--color-text);
+}
+
+.nez-button--icon {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+}
+
+.nez-button--icon:hover:not(:disabled) {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  transform: translateY(-1px);
+}
+
+.nez-button--active {
+  color: var(--color-gold);
+  border-color: var(--color-gold);
+}
