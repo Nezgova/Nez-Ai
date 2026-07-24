@@ -5,30 +5,51 @@ import Header from '../components/Header/Header';
 import ChatWindow from '../components/Chat/ChatWindow';
 import ChatInput from '../components/Input/ChatInput';
 import type{ Message } from '../components/Message/Message';
+import { sendMessageToAssistant } from '../services/api';
 
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
 
-  const handleSend = () => {
-    const trimmed = inputValue.trim();
-    if (trimmed.length === 0) return;
+ const handleSend = async () => {
+  const trimmed = inputValue.trim();
 
-    const userMessage: Message = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      content: trimmed,
-    };
+  if (trimmed.length === 0) return;
+
+  const userMessage: Message = {
+    id: crypto.randomUUID(),
+    role: 'user',
+    content: trimmed,
+  };
+
+  // Show the user's message immediately
+  setMessages((prev) => [...prev, userMessage]);
+
+  // Clear the input
+  setInputValue('');
+
+  try {
+    const reply = await sendMessageToAssistant(trimmed);
 
     const assistantMessage: Message = {
       id: crypto.randomUUID(),
       role: 'assistant',
-      content: 'Nez AI is ready.\nConnect a local model to start chatting.',
+      content: reply,
     };
 
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
-    setInputValue('');
-  };
+    setMessages((prev) => [...prev, assistantMessage]);
+
+  } catch (error) {
+
+    const assistantMessage: Message = {
+      id: crypto.randomUUID(),
+      role: 'assistant',
+      content: '❌ Unable to connect to the backend.',
+    };
+
+    setMessages((prev) => [...prev, assistantMessage]);
+  }
+};
 
   const handleExampleClick = (prompt: string) => {
     setInputValue(prompt);
