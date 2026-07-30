@@ -1,0 +1,59 @@
+.message-attachment {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  max-width: 280px;
+  transition: transform 0.2s var(--ease-premium), border-color 0.2s var(--ease-premium);
+}
+
+.message-attachment:hover {
+  transform: translateY(-1px);
+  border-color: rgba(196, 30, 58, 0.35);
+}
+
+.message-attachment-image {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  min-height: 160px;
+  background: linear-gradient(135deg, rgba(196, 30, 58, 0.08), rgba(11, 11, 13, 0.92));
+}
+
+.message-attachment-meta {
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+
+.message-attachment-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.message-attachment-size {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.message-attachment-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 11, 13, 0.88);
+  padding: 24px;
+}
+
+.message-attachment-full {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}

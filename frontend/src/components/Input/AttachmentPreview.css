@@ -39,7 +39,7 @@
 
   background: rgba(255,255,255,0.04);
 
-  color: var(--color-gold);
+  color: var(--color-accent);
 
   flex-shrink: 0;
 }

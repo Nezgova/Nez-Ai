@@ -1,30 +1,32 @@
 :root {
-  --color-bg: #0B0D11;
-  --color-sidebar: #13161D;
-  --color-card: #1B1F27;
-  --color-card-hover: #21252E;
-  --color-border: #2B313D;
-  --color-border-soft: rgba(212, 175, 55, 0.18);
+  --color-bg: #0B0B0D;
+  --color-sidebar: #111217;
+  --color-surface: #141418;
+  --color-card: #1C1C22;
+  --color-card-hover: #23232B;
+  --color-border: #2A2A33;
+  --color-border-soft: rgba(196, 30, 58, 0.18);
 
-  --color-gold: #D4AF37;
-  --color-gold-hover: #E8C766;
-  --color-gold-soft: rgba(212, 175, 55, 0.12);
+  --color-primary: #7A0C17;
+  --color-secondary: #A11222;
+  --color-accent: #C41E3A;
+  --color-hover: #B11522;
 
-  --color-text: #FFFFFF;
-  --color-text-secondary: #9CA3AF;
-  --color-text-tertiary: #6B7280;
+  --color-text: #F5F5F5;
+  --color-text-secondary: #A8A8B3;
+  --color-text-tertiary: #7D7E89;
 
   --color-success: #4ADE80;
   --color-error: #E5484D;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
 
-  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.42);
-  --shadow-gold: 0 0 0 1px rgba(212, 175, 55, 0.35), 0 8px 30px rgba(212, 175, 55, 0.08);
+  --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 18px 50px rgba(0, 0, 0, 0.32);
+  --shadow-accent: 0 0 0 1px rgba(196, 30, 58, 0.22), 0 16px 40px rgba(196, 30, 58, 0.08);
 
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -86,13 +88,13 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(212, 175, 55, 0.18);
+  background-color: rgba(196, 30, 58, 0.18);
   border-radius: 8px;
   transition: background-color 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(212, 175, 55, 0.4);
+  background-color: rgba(196, 30, 58, 0.38);
 }
 
 /* Ambient animated background */
@@ -102,9 +104,9 @@ a {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(600px circle at 15% 20%, rgba(212, 175, 55, 0.055), transparent 60%),
-    radial-gradient(700px circle at 85% 75%, rgba(212, 175, 55, 0.04), transparent 60%),
-    radial-gradient(900px circle at 50% 100%, rgba(255, 255, 255, 0.02), transparent 70%);
+    radial-gradient(500px circle at 15% 20%, rgba(196, 30, 58, 0.06), transparent 60%),
+    radial-gradient(650px circle at 85% 75%, rgba(196, 30, 58, 0.035), transparent 60%),
+    radial-gradient(900px circle at 50% 100%, rgba(255, 255, 255, 0.01), transparent 70%);
   animation: ambientDrift 22s ease-in-out infinite alternate;
 }
 

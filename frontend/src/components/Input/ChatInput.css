@@ -1,9 +1,9 @@
 .chat-input-wrapper {
   position: relative;
   z-index: 1;
-  padding: 16px 32px 24px 32px;
+  padding: 16px 32px 16px 32px;
   border-top: 1px solid var(--color-border);
-  background-color: rgba(11, 13, 17, 0.6);
+  background-color: rgba(11, 13, 17, 0.72);
   backdrop-filter: blur(12px);
 }
 
@@ -17,6 +17,16 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: 8px 10px;
+  transition: border-color 0.2s var(--ease-premium), box-shadow 0.2s var(--ease-premium);
+}
+
+.chat-input-bar:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px rgba(196, 30, 58, 0.18);
+}
+
+.chat-input-field:focus {
+  outline: none;
 }
 
 .chat-input-file-input {
@@ -50,7 +60,7 @@
 
 .chat-input-icon-btn:hover {
   background-color: var(--color-bg);
-  color: var(--color-gold);
+  color: var(--color-accent);
 }
 
 .chat-input-send-btn {
@@ -60,13 +70,13 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  background-color: var(--color-gold);
-  color: #14161B;
+  background-color: var(--color-accent);
+  color: var(--color-text);
   flex-shrink: 0;
 }
 
 .chat-input-send-btn:hover {
-  background-color: var(--color-gold-hover);
+  background-color: var(--color-hover);
 }
 
 .chat-input-hint {

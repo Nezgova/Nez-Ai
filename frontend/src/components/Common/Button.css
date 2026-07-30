@@ -17,13 +17,13 @@
 }
 
 .nez-button--primary {
-  background-color: var(--color-gold);
-  color: #14161B;
+  background-color: var(--color-accent);
+  color: var(--color-text);
 }
 
 .nez-button--primary:hover:not(:disabled) {
-  background-color: var(--color-gold-hover);
-  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.25);
+  background-color: var(--color-hover);
+  box-shadow: 0 6px 18px rgba(196, 30, 58, 0.24);
 }
 
 .nez-button--ghost {
@@ -33,7 +33,7 @@
 }
 
 .nez-button--ghost:hover:not(:disabled) {
-  border-color: var(--color-gold);
+  border-color: var(--color-accent);
   color: var(--color-text);
 }
 
@@ -46,12 +46,12 @@
 }
 
 .nez-button--icon:hover:not(:disabled) {
-  border-color: var(--color-gold);
-  color: var(--color-gold);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .nez-button--active {
-  color: var(--color-gold);
-  border-color: var(--color-gold);
-  box-shadow: var(--shadow-gold);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-accent);
 }

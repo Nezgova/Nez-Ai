@@ -13,7 +13,7 @@ export async function checkBackendHealth(): Promise<HealthStatus> {
       return { connected: false };
     }
     return { connected: true };
-  } catch (error) {
+  } catch {
     return { connected: false };
   }
 }

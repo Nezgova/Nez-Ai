@@ -20,12 +20,13 @@ const examplePrompts: ExamplePrompt[] = [
 interface ChatWindowProps {
   messages: MessageType[];
   onExampleClick: (prompt: string) => void;
+  isDragActive: boolean;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onExampleClick }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onExampleClick, isDragActive }) => {
   if (messages.length === 0) {
     return (
-      <div className="chat-window">
+      <div className={`chat-window ${isDragActive ? 'chat-window--drag-active' : ''}`}>
         <motion.div
           className="empty-state"
           initial={{ opacity: 0, y: 14 }}
@@ -69,7 +70,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onExampleClick }) => 
   }
 
   return (
-    <div className="chat-window">
+    <div className={`chat-window ${isDragActive ? 'chat-window--drag-active' : ''}`}>
       <div className="chat-window-inner">
         {messages.map((message) => (
           <Message key={message.id} message={message} />

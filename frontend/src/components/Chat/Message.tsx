@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import './Message.css';
+import MessageAttachment from '../Message/MessageAttachment';
+import TypingIndicator from './TypingIndicator';
 import type { Message as MessageType } from '../Message/Message';
 
 interface MessageProps {
@@ -19,7 +21,18 @@ const Message: React.FC<MessageProps> = ({ message }) => {
     >
       <div className={`message-bubble ${isUser ? 'message-bubble--user' : 'message-bubble--assistant'}`}>
         <span className="message-role">{isUser ? 'You' : 'Nez AI'}</span>
-        <p className="message-content">{message.content}</p>
+
+        {message.attachment && message.attachment.type === 'image' && (
+          <MessageAttachment attachment={message.attachment} />
+        )}
+
+        <div className="message-body">
+          {message.isTyping ? (
+            <TypingIndicator label={message.content} />
+          ) : (
+            <p className="message-content">{message.content}</p>
+          )}
+        </div>
       </div>
     </motion.div>
   );

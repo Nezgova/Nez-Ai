@@ -73,6 +73,6 @@
 }
 
 .header-settings-btn:hover {
-  border-color: var(--color-gold);
-  color: var(--color-gold);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }

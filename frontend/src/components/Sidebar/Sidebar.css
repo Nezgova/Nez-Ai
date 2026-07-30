@@ -24,14 +24,14 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--color-gold), #9c7c22);
-  color: #14161B;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+  color: var(--color-text);
   font-weight: 700;
   font-size: 19px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
+  box-shadow: 0 4px 16px rgba(196, 30, 58, 0.24);
   cursor: default;
 }
 
@@ -97,7 +97,7 @@
 
 .sidebar-nav-item--active {
   background-color: var(--color-card);
-  color: var(--color-gold);
+  color: var(--color-accent);
   box-shadow: inset 0 0 0 1px var(--color-border-soft);
 }
 
@@ -108,8 +108,8 @@
   bottom: 8px;
   width: 3px;
   border-radius: 4px;
-  background-color: var(--color-gold);
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+  background-color: var(--color-accent);
+  box-shadow: 0 0 10px rgba(196, 30, 58, 0.6);
 }
 
 .sidebar-nav-item--disabled {
