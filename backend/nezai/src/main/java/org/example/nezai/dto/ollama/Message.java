@@ -1,9 +1,12 @@
 package org.example.nezai.dto.ollama;
 
+import java.util.List;
+
 public class Message {
 
     private String role;
     private String content;
+    private List<String> images;
 
     public Message() {
     }
@@ -27,5 +30,13 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 }

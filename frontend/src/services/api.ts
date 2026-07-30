@@ -1,3 +1,5 @@
+import type { Attachment } from '../types/Attachment';
+
 const API_BASE_URL = 'http://localhost:8081';
 
 export interface HealthStatus {
@@ -16,13 +18,22 @@ export async function checkBackendHealth(): Promise<HealthStatus> {
   }
 }
 
-export async function sendMessageToAssistant(content: string): Promise<string> {
+export async function sendMessageToAssistant(message: string, attachment: Attachment | null): Promise<string> {
+  const formData = new FormData();
+  formData.append('message', message);
+
+  if (attachment) {
+    if (attachment.type === 'image') {
+      formData.append('image', attachment.file);
+    }
+    if (attachment.type === 'pdf') {
+      formData.append('pdf', attachment.file);
+    }
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/chat`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ content }),
+    body: formData,
   });
 
   if (!response.ok) {
