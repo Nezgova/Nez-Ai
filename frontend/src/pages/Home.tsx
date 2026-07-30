@@ -6,11 +6,12 @@ import ChatWindow from '../components/Chat/ChatWindow';
 import ChatInput from '../components/Input/ChatInput';
 import type{ Message } from '../components/Message/Message';
 import { sendMessageToAssistant } from '../services/api';
+import type { Attachment } from '../types/Attachment';
 
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
-
+  const [attachment, setAttachment] = useState<Attachment | null>(null);
  const handleSend = async () => {
   const trimmed = inputValue.trim();
 
@@ -27,6 +28,8 @@ const Home: React.FC = () => {
 
   // Clear the input
   setInputValue('');
+
+  setAttachment(null);
 
   try {
     const reply = await sendMessageToAssistant(trimmed);
@@ -62,7 +65,7 @@ const Home: React.FC = () => {
       <div className="home-main">
         <Header />
         <ChatWindow messages={messages} onExampleClick={handleExampleClick} />
-        <ChatInput value={inputValue} onChange={setInputValue} onSend={handleSend} />
+        <ChatInput value={inputValue} onChange={setInputValue} onSend={handleSend} attachment={attachment} setAttachment={setAttachment} />
       </div>
     </div>
   );
