@@ -57,7 +57,7 @@ const Sidebar: React.FC = () => {
           whileHover={{ scale: 1.05, rotate: 3 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         >
-          N
+          <img src="/brand/nez-ai-logo.png" alt="Nez AI logo" />
         </motion.div>
         <div className="sidebar-brand-text">
           <span className="sidebar-title">Nez AI</span>

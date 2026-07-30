@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Code2, FileText, Bug, GitBranch } from 'lucide-react';
+import { Code2, FileText, Bug, GitBranch } from 'lucide-react';
 import './ChatWindow.css';
 import Message from './Message';
 import type { Message as MessageType } from '../Message/Message';
@@ -39,7 +39,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onExampleClick, isDra
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Sparkles size={30} />
+            <img src="/brand/nez-ai-logo.png" alt="Nez AI logo" />
           </motion.div>
           <h2 className="empty-state-title">Welcome to Nez AI</h2>
           <p className="empty-state-subtitle">

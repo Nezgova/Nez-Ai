@@ -40,13 +40,18 @@
   width: 64px;
   height: 64px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-  color: var(--color-text);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 30px rgba(196, 30, 58, 0.24);
   margin-bottom: 24px;
+}
+
+.empty-state-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .empty-state-title {
