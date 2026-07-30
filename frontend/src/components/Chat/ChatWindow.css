@@ -11,8 +11,11 @@
 }
 
 .chat-window-inner {
-  flex: 1;
-  min-height: 0;
+  /* Keep short conversations pinned to the bottom without shrinking the
+     message list when a typing indicator is replaced by a response. */
+  flex: 0 0 auto;
+  min-height: 100%;
+  width: 100%;
   max-width: 860px;
   margin: 0 auto;
   display: flex;

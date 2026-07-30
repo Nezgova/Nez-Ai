@@ -67,7 +67,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
         className={`chat-input-bar ${focused ? 'chat-input-bar--focused' : ''}`}
         animate={{
           boxShadow: focused
-            ? '0 0 0 1px rgba(212,175,55,0.5), 0 8px 30px rgba(212,175,55,0.12)'
+            ? '0 0 0 1px rgba(196, 30, 58, 0.5), 0 8px 30px rgba(196, 30, 58, 0.12)'
             : '0 2px 10px rgba(0,0,0,0.3)',
         }}
         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
