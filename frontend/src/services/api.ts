@@ -43,3 +43,20 @@ export async function sendMessageToAssistant(message: string, attachment: Attach
   const data = await response.json();
   return data.reply as string;
 }
+
+export async function transcribeAudio(audio: Blob): Promise<string> {
+  const formData = new FormData();
+  formData.append('audio', audio, 'recording.wav');
+
+  const response = await fetch(`${API_BASE_URL}/api/speech/transcribe`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.detail || data.message || 'Unable to transcribe the recording locally.');
+  }
+
+  return data.text as string;
+}

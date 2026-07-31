@@ -79,9 +79,44 @@
   background-color: var(--color-hover);
 }
 
+.chat-input-mic-btn--recording {
+  background-color: var(--color-accent);
+  color: var(--color-text);
+  box-shadow: 0 0 0 1px rgba(196, 30, 58, 0.45), 0 0 18px rgba(196, 30, 58, 0.48);
+  animation: microphonePulse 1.5s ease-in-out infinite;
+}
+
+.chat-input-mic-btn--recording:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text);
+}
+
+.chat-input-mic-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .chat-input-hint {
   text-align: center;
   font-size: 11.5px;
   color: var(--color-text-tertiary);
   margin-top: 11px;
+}
+
+.chat-input-hint--voice {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.chat-input-hint--voice span {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes microphonePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(196, 30, 58, 0.45), 0 0 12px rgba(196, 30, 58, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(196, 30, 58, 0.08), 0 0 24px rgba(196, 30, 58, 0.58);
+  }
 }
