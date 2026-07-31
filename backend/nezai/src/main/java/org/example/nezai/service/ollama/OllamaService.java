@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
@@ -49,13 +50,17 @@ public class OllamaService {
                 )
         );
 
-        OllamaResponse response = restClient.post()
-                .uri(ollamaUrl + "/api/chat")
-                .body(request)
-                .retrieve()
-                .body(OllamaResponse.class);
+        try {
+            OllamaResponse response = restClient.post()
+                    .uri(ollamaUrl + "/api/chat")
+                    .body(request)
+                    .retrieve()
+                    .body(OllamaResponse.class);
 
-        return response.getMessage().getContent();
+            return getResponseContent(response);
+        } catch (ResourceAccessException ex) {
+            throw ollamaUnavailable(ex);
+        }
 
     }
 
@@ -88,14 +93,32 @@ public class OllamaService {
                     .body(OllamaResponse.class);
 
             logger.info("Vision response received");
-            return response.getMessage().getContent();
+            return getResponseContent(response);
         } catch (IOException ex) {
             logger.error("Failed to read uploaded image", ex);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to process uploaded image", ex);
+        } catch (ResourceAccessException ex) {
+            throw ollamaUnavailable(ex);
         } catch (Exception ex) {
             logger.error("Vision request failed", ex);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to call Ollama vision model", ex);
         }
+    }
+
+    private String getResponseContent(OllamaResponse response) {
+        if (response == null || response.getMessage() == null || response.getMessage().getContent() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Ollama returned an invalid chat response");
+        }
+        return response.getMessage().getContent();
+    }
+
+    private ResponseStatusException ollamaUnavailable(ResourceAccessException ex) {
+        logger.warn("Ollama is unavailable at {}. Start Ollama and verify that it is listening on port 11434.", ollamaUrl);
+        return new ResponseStatusException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Ollama is unavailable. Start Ollama and make sure it is listening at " + ollamaUrl,
+                ex
+        );
     }
 
     private void logRequestPayload(OllamaRequest request, int imageLength) {
