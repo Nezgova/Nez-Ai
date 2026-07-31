@@ -5,7 +5,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -105,16 +107,60 @@ public class SpeechService {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "whisper.cpp is not configured. Set speech.whisper.executable.");
         }
-        if (whisperModel == null || whisperModel.isBlank() || !Files.isRegularFile(Path.of(whisperModel))) {
+
+        Path resolvedModelPath = resolveExistingPath(whisperModel);
+        if (resolvedModelPath == null || !Files.isRegularFile(resolvedModelPath)) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Whisper model not found. Set speech.whisper.model to a local model file.");
         }
+        whisperModel = resolvedModelPath.toString();
 
-        Path executablePath = Path.of(whisperExecutable);
-        if (executablePath.getParent() != null && !Files.isRegularFile(executablePath)) {
+        Path resolvedExecutablePath = resolveExistingPath(whisperExecutable);
+        if (resolvedExecutablePath == null || !Files.isRegularFile(resolvedExecutablePath)) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "whisper.cpp executable not found. Set speech.whisper.executable to its local path.");
         }
+        whisperExecutable = resolvedExecutablePath.toString();
+    }
+
+    private Path resolveExistingPath(String configuredPath) {
+        if (configuredPath == null || configuredPath.isBlank()) {
+            return null;
+        }
+
+        Path configured = Path.of(configuredPath);
+        if (configured.isAbsolute()) {
+            return Files.isRegularFile(configured) ? configured.toAbsolutePath().normalize() : null;
+        }
+
+        Set<Path> candidates = new LinkedHashSet<>();
+        Path cwd = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
+
+        candidates.add(cwd.resolve(configured));
+        candidates.add(cwd.resolve("backend").resolve("nezai").resolve(configured));
+
+        Path parent = cwd.getParent();
+        if (parent != null) {
+            candidates.add(parent.resolve("backend").resolve("nezai").resolve(configured));
+        }
+
+        Path current = cwd;
+        while (current != null) {
+            candidates.add(current.resolve(configured));
+            if (Files.exists(current.resolve("backend").resolve("nezai"))) {
+                candidates.add(current.resolve("backend").resolve("nezai").resolve(configured));
+            }
+            current = current.getParent();
+        }
+
+        for (Path candidate : candidates) {
+            Path normalized = candidate.normalize();
+            if (Files.isRegularFile(normalized)) {
+                return normalized;
+            }
+        }
+
+        return null;
     }
 
     private void deleteIfPresent(Path path) {
