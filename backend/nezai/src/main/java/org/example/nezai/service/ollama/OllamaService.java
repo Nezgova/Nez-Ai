@@ -17,6 +17,7 @@ import java.util.List;
 import org.example.nezai.dto.ollama.Message;
 import org.example.nezai.dto.ollama.OllamaRequest;
 import org.example.nezai.dto.ollama.OllamaResponse;
+import org.example.nezai.dto.ChatMessage;
 
 @Service
 public class OllamaService {
@@ -31,60 +32,17 @@ public class OllamaService {
     @Value("${ollama.model}")
     private String model;
 
-    @Value("${ollama.think}")
-    private boolean think;
 
     public OllamaService(RestClient restClient, ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 
-    public String ask(String prompt) {
-
-        OllamaRequest request = new OllamaRequest(
-                model,
-                think,
-                false,
-                List.of(
-                        new Message("user", prompt)
-                )
-        );
-
+    public String ask(List<ChatMessage> history, List<MultipartFile> images, boolean think) {
         try {
-            OllamaResponse response = restClient.post()
-                    .uri(ollamaUrl + "/api/chat")
-                    .body(request)
-                    .retrieve()
-                    .body(OllamaResponse.class);
+            OllamaRequest request = buildRequest(history, images, think);
 
-            return getResponseContent(response);
-        } catch (ResourceAccessException ex) {
-            throw ollamaUnavailable(ex);
-        }
-
-    }
-
-    public String askWithImage(String prompt, MultipartFile image) {
-        logger.info("Vision request started");
-        logger.info("Image filename: {}", image.getOriginalFilename());
-        logger.info("Image size: {} bytes", image.getSize());
-
-        try {
-            byte[] imageBytes = image.getBytes();
-            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-            String imagePayload = base64Image;
-
-            Message userMessage = new Message("user", prompt);
-            userMessage.setImages(List.of(imagePayload));
-
-            OllamaRequest request = new OllamaRequest(
-                    model,
-                    think,
-                    false,
-                    List.of(userMessage)
-            );
-
-            logRequestPayload(request, base64Image.length());
+            logRequestPayload(request);
 
             OllamaResponse response = restClient.post()
                     .uri(ollamaUrl + "/api/chat")
@@ -92,17 +50,34 @@ public class OllamaService {
                     .retrieve()
                     .body(OllamaResponse.class);
 
-            logger.info("Vision response received");
             return getResponseContent(response);
         } catch (IOException ex) {
             logger.error("Failed to read uploaded image", ex);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to process uploaded image", ex);
         } catch (ResourceAccessException ex) {
             throw ollamaUnavailable(ex);
+        } catch (ResponseStatusException ex) {
+            throw ex;
         } catch (Exception ex) {
-            logger.error("Vision request failed", ex);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to call Ollama vision model", ex);
+            logger.error("Ollama chat request failed", ex);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to call Ollama", ex);
         }
+    }
+
+    OllamaRequest buildRequest(List<ChatMessage> history, List<MultipartFile> images, boolean think) throws IOException {
+        List<Message> messages = new java.util.ArrayList<>();
+        int imageIndex = 0;
+        for (ChatMessage historyMessage : history) {
+            Message message = new Message(historyMessage.getRole(), historyMessage.getContent());
+            if (historyMessage.isHasImage()) {
+                if (images == null || imageIndex >= images.size() || images.get(imageIndex).isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Conversation history references a missing image");
+                }
+                message.setImages(List.of(Base64.getEncoder().encodeToString(images.get(imageIndex++).getBytes())));
+            }
+            messages.add(message);
+        }
+        return new OllamaRequest(model, think, false, messages);
     }
 
     private String getResponseContent(OllamaResponse response) {
@@ -121,12 +96,12 @@ public class OllamaService {
         );
     }
 
-    private void logRequestPayload(OllamaRequest request, int imageLength) {
+    private void logRequestPayload(OllamaRequest request) {
         try {
             List<Message> debugMessages = request.getMessages().stream().map(message -> {
                 Message debugMessage = new Message(message.getRole(), message.getContent());
                 if (message.getImages() != null && !message.getImages().isEmpty()) {
-                    debugMessage.setImages(List.of("[base64 image omitted, length=" + imageLength + "]"));
+                    debugMessage.setImages(List.of("[base64 image omitted]"));
                 }
                 return debugMessage;
             }).toList();
@@ -138,24 +113,10 @@ public class OllamaService {
                     debugMessages
             );
             String debugJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(debugRequest);
-            logger.info("Ollama vision request payload: {}", debugJson);
+            logger.info("Ollama request payload (images omitted): {}", debugJson);
         } catch (Exception ex) {
             logger.warn("Failed to log Ollama request payload", ex);
         }
-    }
-
-    private String getImageExtension(String filename) {
-        if (filename == null || !filename.contains(".")) {
-            return "png";
-        }
-        String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
-        if (extension.equals("jpg")) {
-            extension = "jpeg";
-        }
-        if (extension.equals("jpeg") || extension.equals("png") || extension.equals("webp")) {
-            return extension;
-        }
-        return "png";
     }
 
 }

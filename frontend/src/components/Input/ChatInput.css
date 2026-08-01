@@ -75,6 +75,29 @@
   flex-shrink: 0;
 }
 
+.chat-input-think-btn {
+  padding: 0 10px;
+  min-width: 78px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.chat-input-think-btn--active {
+  background-color: rgba(196, 30, 58, 0.14);
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px rgba(196, 30, 58, 0.2);
+}
+
+.chat-input-think-btn--active:hover {
+  background-color: rgba(196, 30, 58, 0.2);
+  color: var(--color-accent);
+}
+
+.chat-input-think-label {
+  line-height: 1;
+}
+
 .chat-input-send-btn:hover {
   background-color: var(--color-hover);
 }

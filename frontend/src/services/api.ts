@@ -1,4 +1,5 @@
-import type { Attachment } from '../types/Attachment';
+import type { ChatSettings } from '../types/ChatSettings';
+import type { Message } from '../components/Message/Message';
 
 const API_BASE_URL = 'http://localhost:8081';
 
@@ -18,16 +19,22 @@ export async function checkBackendHealth(): Promise<HealthStatus> {
   }
 }
 
-export async function sendMessageToAssistant(message: string, attachment: Attachment | null): Promise<string> {
+export async function sendMessageToAssistant(history: Message[], settings: ChatSettings): Promise<string> {
   const formData = new FormData();
-  formData.append('message', message);
+  const conversation = history
+    .filter((message) => !message.isTyping)
+    .map((message) => ({
+      role: message.role,
+      content: message.content,
+      hasImage: message.role === 'user' && message.attachment?.type === 'image' && message.attachment.file instanceof File,
+    }));
 
-  if (attachment) {
-    if (attachment.type === 'image') {
-      formData.append('image', attachment.file);
-    }
-    if (attachment.type === 'pdf') {
-      formData.append('pdf', attachment.file);
+  formData.append('history', new Blob([JSON.stringify(conversation)], { type: 'application/json' }));
+  formData.append('think', String(settings.think));
+
+  for (const message of history) {
+    if (message.role === 'user' && !message.isTyping && message.attachment?.type === 'image' && message.attachment.file instanceof File) {
+      formData.append('images', message.attachment.file);
     }
   }
 

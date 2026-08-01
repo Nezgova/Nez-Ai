@@ -1,10 +1,12 @@
 package org.example.nezai.controller;
 
 import org.example.nezai.dto.ChatResponse;
+import org.example.nezai.dto.ChatMessage;
 import org.example.nezai.service.ChatService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -19,12 +21,11 @@ public class ChatController {
 
     @PostMapping(value = "/chat", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ChatResponse chat(
-            @RequestPart("message") String message,
-            @RequestPart(value = "image", required = false) MultipartFile image,
-            @RequestPart(value = "pdf", required = false) MultipartFile pdf
+            @RequestPart("history") List<ChatMessage> history,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestParam(value = "think", required = false, defaultValue = "false") boolean think
     ) {
-
-        return chatService.chat(message, image, pdf);
+        return chatService.chat(history, images, think);
 
     }
 

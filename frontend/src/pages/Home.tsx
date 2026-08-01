@@ -7,12 +7,29 @@ import ChatInput from '../components/Input/ChatInput';
 import type { Message } from '../components/Message/Message';
 import { sendMessageToAssistant } from '../services/api';
 import type { Attachment } from '../types/Attachment';
+import type { ChatSettings } from '../types/ChatSettings';
 
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [chatSettings, setChatSettings] = useState<ChatSettings>(() => {
+    if (typeof window === 'undefined') {
+      return { think: false };
+    }
+
+    const stored = window.localStorage.getItem('nezai.chatSettings');
+    if (!stored) {
+      return { think: false };
+    }
+
+    try {
+      return JSON.parse(stored) as ChatSettings;
+    } catch {
+      return { think: false };
+    }
+  });
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
@@ -34,6 +51,10 @@ const Home: React.FC = () => {
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
   }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('nezai.chatSettings', JSON.stringify(chatSettings));
+  }, [chatSettings]);
 
   const attachImage = (file: File) => {
     if (!file.type.startsWith('image/')) return;
@@ -60,6 +81,7 @@ const Home: React.FC = () => {
               previewUrl: attachment.previewUrl!,
               fileName: attachment.file.name,
               size: attachment.file.size,
+              file: attachment.file,
             }
           : undefined,
     };
@@ -76,7 +98,8 @@ const Home: React.FC = () => {
     setAttachment(null);
 
     try {
-      const reply = await sendMessageToAssistant(trimmed, attachment);
+      const conversation = [...messages.filter((message) => !message.isTyping), userMessage];
+      const reply = await sendMessageToAssistant(conversation, chatSettings);
       setMessages((prev) =>
         prev.map((message) =>
           message.id === assistantTyping.id
@@ -148,6 +171,8 @@ const Home: React.FC = () => {
             onSend={handleSend}
             attachment={attachment}
             setAttachment={setAttachment}
+            settings={chatSettings}
+            onSettingsChange={setChatSettings}
           />
 
           {dragActive && (

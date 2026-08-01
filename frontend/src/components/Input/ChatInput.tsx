@@ -4,6 +4,7 @@ import { Image as ImageIcon, Mic, Send } from 'lucide-react';
 import AttachmentPreview from './AttachmentPreview';
 import './ChatInput.css';
 import type { Attachment } from '../../types/Attachment';
+import type { ChatSettings } from '../../types/ChatSettings';
 import { transcribeAudio } from '../../services/api';
 
 interface ChatInputProps {
@@ -12,6 +13,8 @@ interface ChatInputProps {
   onSend: () => void;
   attachment: Attachment | null;
   setAttachment: React.Dispatch<React.SetStateAction<Attachment | null>>;
+  settings: ChatSettings;
+  onSettingsChange: (settings: ChatSettings) => void;
 }
 
 type VoiceState = 'idle' | 'recording' | 'transcribing';
@@ -66,7 +69,7 @@ const audioBufferToWav = (audioBuffer: AudioBuffer) => {
   return new Blob([wav], { type: 'audio/wav' });
 };
 
-const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachment, setAttachment, }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachment, setAttachment, settings, onSettingsChange, }) => {
   const [focused, setFocused] = useState(false);
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [recordingSeconds, setRecordingSeconds] = useState(0);
@@ -256,6 +259,17 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
           whileTap={{ scale: 0.92 }}
         >
           <Send size={16} />
+        </motion.button>
+
+        <motion.button
+          className={`chat-input-icon-btn chat-input-think-btn ${settings.think ? 'chat-input-think-btn--active' : ''}`}
+          type="button"
+          title={settings.think ? 'Disable thinking' : 'Enable thinking'}
+          aria-label={settings.think ? 'Disable thinking' : 'Enable thinking'}
+          onClick={() => onSettingsChange({ think: !settings.think })}
+          whileTap={{ scale: 0.92 }}
+        >
+          <span className="chat-input-think-label">🧠 Think</span>
         </motion.button>
 
         <motion.button
