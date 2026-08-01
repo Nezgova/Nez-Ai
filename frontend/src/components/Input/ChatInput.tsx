@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Mic, Send } from 'lucide-react';
+import { FileImage, FileText, Mic, Send } from 'lucide-react';
 import AttachmentPreview from './AttachmentPreview';
 import './ChatInput.css';
 import type { Attachment } from '../../types/Attachment';
@@ -72,6 +72,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recordingTimerRef = useRef<number | null>(null);
@@ -108,16 +109,30 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
   };
 
   const openImagePicker = () => imageInputRef.current?.click();
+  const openPdfPicker = () => pdfInputRef.current?.click();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
-    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') return;
+    if (!file.type.startsWith('image/')) return;
 
     setAttachment({
-      type: file.type === 'application/pdf' ? 'pdf' : 'image',
+      type: 'image',
       file,
-      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+      previewUrl: URL.createObjectURL(file),
+    });
+    e.target.value = '';
+  };
+
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return;
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) return;
+
+    setAttachment({
+      type: 'pdf',
+      file,
+      previewUrl: undefined,
     });
     e.target.value = '';
   };
@@ -215,8 +230,16 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
         ref={imageInputRef}
         className="chat-input-file-input"
         type="file"
-        accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf,.pdf"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
         onChange={handleImageChange}
+      />
+
+      <input
+        ref={pdfInputRef}
+        className="chat-input-file-input"
+        type="file"
+        accept="application/pdf,.pdf"
+        onChange={handlePdfChange}
       />
 
       <motion.div
@@ -231,9 +254,19 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
         <motion.button
           className="chat-input-icon-btn"
           type="button"
-          title="Attach image or PDF"
-          aria-label="Attach image or PDF"
+          title="Attach image"
+          aria-label="Attach image"
           onClick={openImagePicker}
+        >
+          <FileImage size={17} />
+        </motion.button>
+
+        <motion.button
+          className="chat-input-icon-btn"
+          type="button"
+          title="Attach PDF"
+          aria-label="Attach PDF"
+          onClick={openPdfPicker}
         >
           <FileText size={17} />
         </motion.button>
@@ -275,7 +308,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
       <p className={`chat-input-hint ${voiceState !== 'idle' ? 'chat-input-hint--voice' : ''}`} role={voiceError ? 'alert' : 'status'}>
         {voiceState === 'recording' && <>Listening... <span>{formatRecordingTime(recordingSeconds)}</span></>}
         {voiceState === 'transcribing' && 'Transcribing...'}
-        {voiceState === 'idle' && (voiceError || 'Paste an image or PDF here to attach. Send when ready.')}
+        {voiceState === 'idle' && (voiceError || 'Attach an image or PDF. Send when ready.')}
       </p>
     </div>
   );

@@ -25,12 +25,17 @@ public class ChatService {
         if (history == null || history.isEmpty()) {
             throw new IllegalArgumentException("Conversation history must contain at least one message.");
         }
+
         if (pdf != null && !pdf.isEmpty()) {
             pdfService.cachePdf(conversationId, pdf);
         }
+
         ChatMessage latestUserMessage = history.getLast();
         if ("user".equals(latestUserMessage.getRole())) {
-            latestUserMessage.setContent(pdfService.addRelevantContext(conversationId, latestUserMessage.getContent()));
+            String userPrompt = latestUserMessage.getContent();
+            if (pdf != null && !pdf.isEmpty()) {
+                latestUserMessage.setContent(pdfService.preparePdfContext(conversationId, pdf, userPrompt));
+            }
         }
 
         if (images != null) {
@@ -42,6 +47,5 @@ public class ChatService {
         String reply = ollamaService.ask(history, images, think, stream);
 
         return new ChatResponse(reply);
-
     }
 }

@@ -96,8 +96,9 @@ const Home: React.FC = () => {
     });
     if (id === activeConversationId) setActiveConversationId(fallback.id);
   };
-  const attachImage = (file: File) => (file.type.startsWith('image/') || file.type === 'application/pdf') && setAttachment({ type: file.type === 'application/pdf' ? 'pdf' : 'image', file, previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined });
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => { event.preventDefault(); event.stopPropagation(); setDragActive(false); const file = event.dataTransfer.files?.[0]; if (file) attachImage(file); };
+  const attachImage = (file: File) => file.type.startsWith('image/') && setAttachment({ type: 'image', file, previewUrl: URL.createObjectURL(file) });
+  const attachPdf = (file: File) => (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) && setAttachment({ type: 'pdf', file, previewUrl: undefined });
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => { event.preventDefault(); event.stopPropagation(); setDragActive(false); const file = event.dataTransfer.files?.[0]; if (file) { if (file.type.startsWith('image/')) attachImage(file); else if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) attachPdf(file); } };
 
   return <div className="home-layout">
     {showIntro && <div className="app-intro" role="status" aria-label="Starting Nez AI" onClick={() => setShowIntro(false)}>
@@ -109,7 +110,7 @@ const Home: React.FC = () => {
       <div className={`chat-area ${dragActive ? 'chat-area--drag-active' : ''}`} onDragEnter={(event) => { event.preventDefault(); setDragActive(true); }} onDragOver={(event) => { event.preventDefault(); setDragActive(true); }} onDragLeave={(event) => { event.preventDefault(); setDragActive(false); }} onDrop={handleDrop}>
         <ChatWindow messages={messages} onExampleClick={setInputValue} isDragActive={dragActive} />
         <ChatInput value={inputValue} onChange={setInputValue} onSend={handleSend} attachment={attachment} setAttachment={setAttachment} />
-        {dragActive && <div className="chat-drop-overlay"><div className="chat-drop-message">Drop image to attach</div></div>}
+        {dragActive && <div className="chat-drop-overlay"><div className="chat-drop-message">Drop an image or PDF to attach</div></div>}
       </div>
     </div>
   </div>;

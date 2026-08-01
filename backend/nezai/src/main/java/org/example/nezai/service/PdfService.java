@@ -39,7 +39,7 @@ public class PdfService {
         }
     }
 
-    public String addRelevantContext(String conversationId, String question) {
+    public String preparePdfContext(String conversationId, MultipartFile pdf, String question) {
         List<String> chunks = chunksByConversation.get(conversationId);
         if (chunks == null || chunks.isEmpty()) return question;
         String effectiveQuestion = "PDF attached".equalsIgnoreCase(question.trim()) ? "Summarize the attached PDF." : question;
