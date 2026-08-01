@@ -23,6 +23,8 @@
   background: linear-gradient(135deg, rgba(196, 30, 58, 0.08), rgba(11, 11, 13, 0.92));
 }
 
+.message-attachment-pdf { height: 120px; display: grid; place-items: center; color: var(--color-accent); background: linear-gradient(135deg, rgba(196,30,58,.16), rgba(11,11,13,.92)); }
+
 .message-attachment-meta {
   padding: 12px 14px;
   display: grid;

@@ -14,14 +14,23 @@ public class ChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
     private final OllamaService ollamaService;
+    private final PdfService pdfService;
 
-    public ChatService(OllamaService ollamaService) {
+    public ChatService(OllamaService ollamaService, PdfService pdfService) {
         this.ollamaService = ollamaService;
+        this.pdfService = pdfService;
     }
 
-    public ChatResponse chat(List<ChatMessage> history, List<MultipartFile> images, boolean think, boolean stream) {
+    public ChatResponse chat(String conversationId, List<ChatMessage> history, List<MultipartFile> images, MultipartFile pdf, boolean think, boolean stream) {
         if (history == null || history.isEmpty()) {
             throw new IllegalArgumentException("Conversation history must contain at least one message.");
+        }
+        if (pdf != null && !pdf.isEmpty()) {
+            pdfService.cachePdf(conversationId, pdf);
+        }
+        ChatMessage latestUserMessage = history.getLast();
+        if ("user".equals(latestUserMessage.getRole())) {
+            latestUserMessage.setContent(pdfService.addRelevantContext(conversationId, latestUserMessage.getContent()));
         }
 
         if (images != null) {

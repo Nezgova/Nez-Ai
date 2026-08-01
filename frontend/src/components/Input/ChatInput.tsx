@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Image as ImageIcon, Mic, Send } from 'lucide-react';
+import { FileText, Mic, Send } from 'lucide-react';
 import AttachmentPreview from './AttachmentPreview';
 import './ChatInput.css';
 import type { Attachment } from '../../types/Attachment';
@@ -112,11 +112,12 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
+    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') return;
 
     setAttachment({
-      type: 'image',
+      type: file.type === 'application/pdf' ? 'pdf' : 'image',
       file,
-      previewUrl: URL.createObjectURL(file),
+      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
     });
     e.target.value = '';
   };
@@ -214,7 +215,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
         ref={imageInputRef}
         className="chat-input-file-input"
         type="file"
-        accept="image/png,image/jpeg,image/jpg,image/webp"
+        accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf,.pdf"
         onChange={handleImageChange}
       />
 
@@ -230,10 +231,11 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
         <motion.button
           className="chat-input-icon-btn"
           type="button"
-
+          title="Attach image or PDF"
+          aria-label="Attach image or PDF"
           onClick={openImagePicker}
         >
-          <ImageIcon size={17} />
+          <FileText size={17} />
         </motion.button>
 
         <input
@@ -273,7 +275,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ value, onChange, onSend, attachme
       <p className={`chat-input-hint ${voiceState !== 'idle' ? 'chat-input-hint--voice' : ''}`} role={voiceError ? 'alert' : 'status'}>
         {voiceState === 'recording' && <>Listening... <span>{formatRecordingTime(recordingSeconds)}</span></>}
         {voiceState === 'transcribing' && 'Transcribing...'}
-        {voiceState === 'idle' && (voiceError || 'Paste an image or drag it here to attach. Send when ready.')}
+        {voiceState === 'idle' && (voiceError || 'Paste an image or PDF here to attach. Send when ready.')}
       </p>
     </div>
   );

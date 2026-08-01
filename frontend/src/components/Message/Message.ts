@@ -1,7 +1,7 @@
 export type MessageRole = 'user' | 'assistant';
 
 export interface MessageAttachmentData {
-  type: 'image';
+  type: 'image' | 'pdf';
   previewUrl: string;
   fileName: string;
   size: number;

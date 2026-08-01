@@ -19,7 +19,7 @@ export async function checkBackendHealth(): Promise<HealthStatus> {
   }
 }
 
-export async function sendMessageToAssistant(history: Message[], settings: ChatSettings): Promise<string> {
+export async function sendMessageToAssistant(conversationId: string, history: Message[], pdf: File | null, settings: ChatSettings): Promise<string> {
   const formData = new FormData();
   const conversation = history
     .filter((message) => !message.isTyping)
@@ -30,6 +30,7 @@ export async function sendMessageToAssistant(history: Message[], settings: ChatS
     }));
 
   formData.append('history', new Blob([JSON.stringify(conversation)], { type: 'application/json' }));
+  formData.append('conversationId', conversationId);
   formData.append('think', String(settings.think));
   formData.append('stream', String(settings.stream));
 
@@ -38,6 +39,7 @@ export async function sendMessageToAssistant(history: Message[], settings: ChatS
       formData.append('images', message.attachment.file);
     }
   }
+  if (pdf) formData.append('pdf', pdf);
 
   const response = await fetch(`${API_BASE_URL}/api/chat`, {
     method: 'POST',

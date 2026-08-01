@@ -63,10 +63,10 @@ const Home: React.FC = () => {
     const currentAttachment = attachment;
     const imageDataUrl = currentAttachment?.type === 'image' ? await fileToDataUrl(currentAttachment.file) : undefined;
     const userMessage: Message = {
-      id: crypto.randomUUID(), role: 'user', content: trimmed || 'Image attached',
-      attachment: currentAttachment?.type === 'image' ? { type: 'image', previewUrl: currentAttachment.previewUrl!, dataUrl: imageDataUrl, fileName: currentAttachment.file.name, size: currentAttachment.file.size, file: currentAttachment.file } : undefined,
+      id: crypto.randomUUID(), role: 'user', content: trimmed || (currentAttachment?.type === 'pdf' ? 'PDF attached' : 'Image attached'),
+      attachment: currentAttachment ? { type: currentAttachment.type, previewUrl: currentAttachment.previewUrl ?? '', dataUrl: currentAttachment.type === 'image' ? imageDataUrl : undefined, fileName: currentAttachment.file.name, size: currentAttachment.file.size, file: currentAttachment.file } : undefined,
     };
-    const assistantTyping: Message = { id: crypto.randomUUID(), role: 'assistant', content: currentAttachment ? 'Analyzing image...' : 'Thinking...', isTyping: true };
+    const assistantTyping: Message = { id: crypto.randomUUID(), role: 'assistant', content: currentAttachment?.type === 'pdf' ? 'Processing PDF...' : currentAttachment ? 'Analyzing image...' : 'Thinking...', isTyping: true };
     const conversationId = activeConversation.id;
     const history = [...activeConversation.messages.filter((message) => !message.isTyping), userMessage];
     updateConversation(conversationId, (conversation) => ({
@@ -76,7 +76,7 @@ const Home: React.FC = () => {
     }));
     setInputValue(''); setAttachment(null);
     try {
-      const reply = await sendMessageToAssistant(history, chatSettings);
+      const reply = await sendMessageToAssistant(conversationId, history, currentAttachment?.type === 'pdf' ? currentAttachment.file : null, chatSettings);
       updateConversation(conversationId, (conversation) => ({ ...conversation, updatedAt: new Date().toISOString(), messages: conversation.messages.map((message) => message.id === assistantTyping.id ? { ...message, content: reply, isTyping: false } : message) }));
     } catch {
       updateConversation(conversationId, (conversation) => ({ ...conversation, updatedAt: new Date().toISOString(), messages: conversation.messages.map((message) => message.id === assistantTyping.id ? { ...message, content: '❌ Unable to connect to the backend.', isTyping: false } : message) }));
@@ -96,7 +96,7 @@ const Home: React.FC = () => {
     });
     if (id === activeConversationId) setActiveConversationId(fallback.id);
   };
-  const attachImage = (file: File) => file.type.startsWith('image/') && setAttachment({ type: 'image', file, previewUrl: URL.createObjectURL(file) });
+  const attachImage = (file: File) => (file.type.startsWith('image/') || file.type === 'application/pdf') && setAttachment({ type: file.type === 'application/pdf' ? 'pdf' : 'image', file, previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined });
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => { event.preventDefault(); event.stopPropagation(); setDragActive(false); const file = event.dataTransfer.files?.[0]; if (file) attachImage(file); };
 
   return <div className="home-layout">

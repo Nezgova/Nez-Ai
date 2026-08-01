@@ -22,7 +22,7 @@ const Message: React.FC<MessageProps> = ({ message }) => {
       <div className={`message-bubble ${isUser ? 'message-bubble--user' : 'message-bubble--assistant'}`}>
         <span className="message-role">{isUser ? 'You' : 'Nez AI'}</span>
 
-        {message.attachment && message.attachment.type === 'image' && (
+        {message.attachment && (
           <MessageAttachment attachment={message.attachment} />
         )}
 
