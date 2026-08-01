@@ -23,11 +23,22 @@ class OllamaServiceTest {
         );
         MockMultipartFile image = new MockMultipartFile("images", "secret.png", "image/png", new byte[]{1, 2, 3});
 
-        OllamaRequest payload = service.buildRequest(history, List.of(image), true);
+        OllamaRequest payload = service.buildRequest(history, List.of(image), true, true);
 
         assertEquals(List.of("user", "assistant", "user"), payload.getMessages().stream().map(message -> message.getRole()).toList());
         assertEquals(List.of("The secret word is pineapple.", "Got it.", "What is the secret word?"), payload.getMessages().stream().map(message -> message.getContent()).toList());
         assertTrue(payload.getMessages().get(2).getImages().getFirst().length() > 0);
         assertTrue(payload.isThink());
+        assertTrue(payload.isStream());
+    }
+
+    @Test
+    void shouldCombineOllamaNdjsonChunksIntoOneReply() throws Exception {
+        OllamaService service = new OllamaService(null, new ObjectMapper());
+        String ndjson = "{\"message\":{\"role\":\"assistant\",\"content\":\"The secret word is \"}}\n"
+                + "{\"message\":{\"role\":\"assistant\",\"content\":\"pineapple.\"}}\n"
+                + "{\"message\":{\"role\":\"assistant\",\"content\":\"\"},\"done\":true}";
+
+        assertEquals("The secret word is pineapple.", service.getStreamingResponseContent(ndjson));
     }
 }

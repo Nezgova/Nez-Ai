@@ -1,116 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import clsx from 'clsx';
-import {
-  MessageSquare,
-  Folder,
-  BrainCircuit,
-  Cpu,
-  Settings,
-  Circle,
-} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { MessageSquarePlus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import './Sidebar.css';
-import { checkBackendHealth } from '../../services/api';
+import type { Conversation } from '../../types/Conversation';
 
-interface NavItem {
-  key: string;
-  label: string;
-  disabled: boolean;
-  icon: React.ReactNode;
+interface SidebarProps {
+  conversations: Conversation[];
+  activeConversationId: string;
+  onNewChat: () => void;
+  onOpenConversation: (id: string) => void;
+  onRenameConversation: (id: string, title: string) => void;
+  onDeleteConversation: (id: string) => void;
 }
 
-const navItems: NavItem[] = [
-  { key: 'chat', label: 'Chat', disabled: false, icon: <MessageSquare size={18} /> },
-  { key: 'files', label: 'Files', disabled: true, icon: <Folder size={18} /> },
-  { key: 'memory', label: 'Memory', disabled: true, icon: <BrainCircuit size={18} /> },
-  { key: 'models', label: 'Models', disabled: true, icon: <Cpu size={18} /> },
-  { key: 'settings', label: 'Settings', disabled: true, icon: <Settings size={18} /> },
-];
+const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
-const Sidebar: React.FC = () => {
-  const [connected, setConnected] = useState<boolean>(true);
+const groupFor = (updatedAt: string) => {
+  const daysAgo = Math.floor((startOfDay(new Date()) - startOfDay(new Date(updatedAt))) / 86_400_000);
+  if (daysAgo <= 0) return 'Today';
+  if (daysAgo === 1) return 'Yesterday';
+  if (daysAgo <= 7) return 'Last 7 Days';
+  return 'Older';
+};
 
-  useEffect(() => {
-    let mounted = true;
+const formatUpdatedAt = (updatedAt: string) => new Intl.DateTimeFormat([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(updatedAt));
 
-    checkBackendHealth().then((status) => {
-      if (mounted) {
-        setConnected(status.connected);
-      }
+const Sidebar: React.FC<SidebarProps> = ({ conversations, activeConversationId, onNewChat, onOpenConversation, onRenameConversation, onDeleteConversation }) => {
+  const [menuId, setMenuId] = useState<string | null>(null);
+
+  const groups = useMemo(() => {
+    const result = new Map<string, Conversation[]>();
+    [...conversations].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).forEach((conversation) => {
+      const group = groupFor(conversation.updatedAt);
+      result.set(group, [...(result.get(group) ?? []), conversation]);
     });
+    return result;
+  }, [conversations]);
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const rename = (conversation: Conversation) => {
+    const title = window.prompt('Rename conversation', conversation.title)?.trim();
+    if (title) onRenameConversation(conversation.id, title.slice(0, 80));
+    setMenuId(null);
+  };
 
-  return (
-    <motion.aside
-      className="sidebar"
-      initial={{ x: -24, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <div className="sidebar-brand">
-        <motion.div
-          className="sidebar-logo"
-          whileHover={{ scale: 1.05, rotate: 3 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <img src="/brand/nez-ai-logo.png" alt="Nez AI logo" />
-        </motion.div>
-        <div className="sidebar-brand-text">
-          <span className="sidebar-title">Nez AI</span>
-          <span className="sidebar-subtitle">Local AI Assistant</span>
-        </div>
-      </div>
+  const remove = (conversation: Conversation) => {
+    if (window.confirm(`Delete “${conversation.title}”? This permanently removes all messages in this conversation.`)) {
+      onDeleteConversation(conversation.id);
+    }
+    setMenuId(null);
+  };
 
-      <nav className="sidebar-nav">
-        {navItems.map((item, index) => (
-          <motion.button
-            key={item.key}
-            className={clsx(
-              'sidebar-nav-item',
-              !item.disabled && 'sidebar-nav-item--active',
-              item.disabled && 'sidebar-nav-item--disabled'
-            )}
-            disabled={item.disabled}
-            type="button"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.35, delay: 0.08 + index * 0.05, ease: [0.16, 1, 0.3, 1] }}
-            whileHover={item.disabled ? undefined : { x: 2 }}
-          >
-            {!item.disabled && (
-              <motion.span
-                layoutId="sidebar-active-pill"
-                className="sidebar-nav-indicator"
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              />
-            )}
-            <span className="sidebar-nav-icon">{item.icon}</span>
-            <span>{item.label}</span>
-          </motion.button>
-        ))}
-      </nav>
-
-      <div className="sidebar-footer">
-        <div className="sidebar-status">
-          <span className="status-dot-wrapper">
-            <Circle
-              size={8}
-              fill={connected ? '#4ADE80' : '#E5484D'}
-              color={connected ? '#4ADE80' : '#E5484D'}
-              className={connected ? 'status-dot-glow' : ''}
-            />
-          </span>
-          <span className="status-label">
-            {connected ? 'Connected' : 'Disconnected'}
-          </span>
-        </div>
-      </div>
-    </motion.aside>
-  );
+  return <aside className="sidebar">
+    <div className="sidebar-brand">
+      <div className="sidebar-logo"><img src="/brand/nez-ai-logo.png" alt="Nez AI logo" /></div>
+      <div className="sidebar-brand-text"><span className="sidebar-title">Nez AI</span><span className="sidebar-subtitle">Local AI Assistant</span></div>
+    </div>
+    <button className="new-chat-button" type="button" onClick={onNewChat}><MessageSquarePlus size={17} /> New Chat</button>
+    <div className="conversation-list">
+      {(['Today', 'Yesterday', 'Last 7 Days', 'Older'] as const).map((group) => {
+        const items = groups.get(group);
+        if (!items?.length) return null;
+        return <section className="conversation-group" key={group}>
+          <h2>{group}</h2>
+          {items.map((conversation) => <div className={`conversation-item ${conversation.id === activeConversationId ? 'conversation-item--active' : ''}`} key={conversation.id}>
+            <button className="conversation-open" type="button" onClick={() => onOpenConversation(conversation.id)}>
+              <span className="conversation-title">{conversation.title}</span><span className="conversation-updated">{formatUpdatedAt(conversation.updatedAt)}</span>
+            </button>
+            <button className="conversation-menu-button" type="button" aria-label={`Actions for ${conversation.title}`} onClick={() => setMenuId(menuId === conversation.id ? null : conversation.id)}><MoreHorizontal size={17} /></button>
+            {menuId === conversation.id && <div className="conversation-menu">
+              <button type="button" onClick={() => rename(conversation)}><Pencil size={14} /> Rename</button>
+              <button type="button" className="conversation-menu-delete" onClick={() => remove(conversation)}><Trash2 size={14} /> Delete Conversation</button>
+            </div>}
+          </div>)}
+        </section>;
+      })}
+    </div>
+  </aside>;
 };
 
 export default Sidebar;

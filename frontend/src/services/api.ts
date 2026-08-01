@@ -31,6 +31,7 @@ export async function sendMessageToAssistant(history: Message[], settings: ChatS
 
   formData.append('history', new Blob([JSON.stringify(conversation)], { type: 'application/json' }));
   formData.append('think', String(settings.think));
+  formData.append('stream', String(settings.stream));
 
   for (const message of history) {
     if (message.role === 'user' && !message.isTyping && message.attachment?.type === 'image' && message.attachment.file instanceof File) {

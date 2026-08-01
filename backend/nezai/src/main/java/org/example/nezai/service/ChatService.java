@@ -19,7 +19,7 @@ public class ChatService {
         this.ollamaService = ollamaService;
     }
 
-    public ChatResponse chat(List<ChatMessage> history, List<MultipartFile> images, boolean think) {
+    public ChatResponse chat(List<ChatMessage> history, List<MultipartFile> images, boolean think, boolean stream) {
         if (history == null || history.isEmpty()) {
             throw new IllegalArgumentException("Conversation history must contain at least one message.");
         }
@@ -30,7 +30,7 @@ public class ChatService {
                     .forEach(image -> logger.info("Image received: {}", image.getOriginalFilename()));
         }
 
-        String reply = ollamaService.ask(history, images, think);
+        String reply = ollamaService.ask(history, images, think, stream);
 
         return new ChatResponse(reply);
 

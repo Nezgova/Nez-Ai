@@ -23,9 +23,10 @@ public class ChatController {
     public ChatResponse chat(
             @RequestPart("history") List<ChatMessage> history,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @RequestParam(value = "think", required = false, defaultValue = "false") boolean think
+            @RequestParam(value = "think", required = false, defaultValue = "false") boolean think,
+            @RequestParam(value = "stream", required = false, defaultValue = "false") boolean stream
     ) {
-        return chatService.chat(history, images, think);
+        return chatService.chat(history, images, think, stream);
 
     }
 

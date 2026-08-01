@@ -38,11 +38,20 @@ public class OllamaService {
         this.objectMapper = objectMapper;
     }
 
-    public String ask(List<ChatMessage> history, List<MultipartFile> images, boolean think) {
+    public String ask(List<ChatMessage> history, List<MultipartFile> images, boolean think, boolean stream) {
         try {
-            OllamaRequest request = buildRequest(history, images, think);
+            OllamaRequest request = buildRequest(history, images, think, stream);
 
             logRequestPayload(request);
+
+            if (stream) {
+                String response = restClient.post()
+                        .uri(ollamaUrl + "/api/chat")
+                        .body(request)
+                        .retrieve()
+                        .body(String.class);
+                return getStreamingResponseContent(response);
+            }
 
             OllamaResponse response = restClient.post()
                     .uri(ollamaUrl + "/api/chat")
@@ -64,7 +73,7 @@ public class OllamaService {
         }
     }
 
-    OllamaRequest buildRequest(List<ChatMessage> history, List<MultipartFile> images, boolean think) throws IOException {
+    OllamaRequest buildRequest(List<ChatMessage> history, List<MultipartFile> images, boolean think, boolean stream) throws IOException {
         List<Message> messages = new java.util.ArrayList<>();
         int imageIndex = 0;
         for (ChatMessage historyMessage : history) {
@@ -77,7 +86,7 @@ public class OllamaService {
             }
             messages.add(message);
         }
-        return new OllamaRequest(model, think, false, messages);
+        return new OllamaRequest(model, think, stream, messages);
     }
 
     private String getResponseContent(OllamaResponse response) {
@@ -85,6 +94,29 @@ public class OllamaService {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Ollama returned an invalid chat response");
         }
         return response.getMessage().getContent();
+    }
+
+    /**
+     * Ollama returns one JSON object per line for stream=true.  The web UI does
+     * not render chunks yet, so the backend joins them into the existing single
+     * reply response rather than exposing the NDJSON response to the frontend.
+     */
+    String getStreamingResponseContent(String responseBody) throws IOException {
+        if (responseBody == null || responseBody.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Ollama returned an empty streaming response");
+        }
+
+        StringBuilder content = new StringBuilder();
+        for (String line : responseBody.lines().filter(line -> !line.isBlank()).toList()) {
+            OllamaResponse chunk = objectMapper.readValue(line, OllamaResponse.class);
+            if (chunk.getMessage() != null && chunk.getMessage().getContent() != null) {
+                content.append(chunk.getMessage().getContent());
+            }
+        }
+        if (content.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Ollama returned no content in its streaming response");
+        }
+        return content.toString();
     }
 
     private ResponseStatusException ollamaUnavailable(ResourceAccessException ex) {

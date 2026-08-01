@@ -30,11 +30,11 @@ class ChatServiceTest {
                 new ChatMessage("assistant", "Got it.", false),
                 new ChatMessage("user", "What is the secret word?", false)
         );
-        when(ollamaService.ask(history, null, true)).thenReturn("reply");
+        when(ollamaService.ask(history, null, true, false)).thenReturn("reply");
 
-        ChatResponse response = chatService.chat(history, null, true);
+        ChatResponse response = chatService.chat(history, null, true, false);
 
         assertEquals("reply", response.getReply());
-        verify(ollamaService).ask(history, null, true);
+        verify(ollamaService).ask(history, null, true, false);
     }
 }

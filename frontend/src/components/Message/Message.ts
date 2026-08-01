@@ -6,6 +6,7 @@ export interface MessageAttachmentData {
   fileName: string;
   size: number;
   file?: File;
+  dataUrl?: string;
 }
 
 export interface Message {
