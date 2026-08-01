@@ -7,7 +7,9 @@ No chat prompt, image, recording, or transcription is sent to a cloud AI provide
 ## Features
 
 - Local chat through Ollama and `qwen3.5:4b`
-- Image attachments for the configured Ollama vision-capable model
+- Persistent conversation history with a sidebar for opening, renaming, and deleting past chats
+- Optional chat settings for Thinking mode and Streaming mode
+- PDF attachments (alongside images) for multimodal prompts
 - Offline push-to-talk transcription with whisper.cpp and `base.en`
 - Editable transcriptions — voice input never sends a message automatically
 - Dark red Nez AI interface
