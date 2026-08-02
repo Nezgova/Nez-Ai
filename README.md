@@ -81,7 +81,7 @@ The image and PDF pipelines are kept separate so image understanding and PDF und
 ### 1. Clone the repository
 
 ```powershell
-git clone <your-repository-url> Nez-Ai
+git clone https://github.com/Nezgova/Nez-Ai
 cd Nez-Ai
 ```
 
